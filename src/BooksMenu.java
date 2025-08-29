@@ -1,34 +1,34 @@
 import java.util.Scanner;
 
 public class BooksMenu {
-    // Metodo para comparar
-    public static String comparePrices (Book book1, Book book2) {
-        float price1 = book1.getPrice();
-        float price2 = book2.getPrice();
-        String priceCmp;
-
-        if (price1 > price2) {
-            priceCmp = book1.getTitle() + " is more expensive than " + book2.getTitle();
-        } else if (price1 < price2) {
-            priceCmp = book1.getTitle() + " is cheaper than " + book2.getTitle();
+    private static Book getExpensiveBook(Book book1, Book book2) {
+        if (book1.getPrice()<book2.getPrice()) {
+            return book2;
         } else {
-            priceCmp = book1.getTitle() + " has the same price as " + book2.getTitle();
+            return book1;
         }
-
-        return priceCmp;
     }
 
     public static void main(String s[]) {
-        Scanner scanner = new Scanner(System.in);  // Create a Scanner object
+        Scanner scanner = new Scanner(System.in);
         Book[] books = new Book[10];
         int bkIdx = 0;
-        int auxIndex1, auxIndex2;
+        int auxIndex1 = 0;
+        int auxIndex2 = 0;
 
         while(true) {
-            System.out.print("Press 1 to view books, 2 to add books, 3 to compare the prices or any other key to exit: ");
+            System.out.print("""
+                            \nMenu:
+                            \t1. View books.
+                            \t2. Add books.
+                            \t3. Change the price of a book.
+                            \t4. Compare two books.
+                            \tAny other to exit.
+                            Option:\s""");
             String userAction = scanner.nextLine();
+
             if (userAction.equals("1")) {
-                for(int i=0;i<books.length;i++) {
+                for (int i=0; i<books.length; i++) {
                     if(books[i] != null) {
                         System.out.println(books[i]);
                     }
@@ -38,39 +38,67 @@ public class BooksMenu {
                     System.out.println("10 books added already. Cannot add any more books!");
                     continue;
                 }
-                System.out.print("Enter book title: ");
-                String tmpTitle = scanner.nextLine();
-                System.out.print("Enter book author: ");
-                String tmpAuthor = scanner.nextLine();
-                System.out.print("Enter book price: ");
-                float tmpPrice = Float.parseFloat(scanner.nextLine());
+                System.out.print("""
+                        \nWhich constructor do you want to use?
+                        \tPress 1 for default+
+                        \tPress 2 for creating a clone of an existing object
+                        \tPress any other key for overloaded constructor
+                        Option:\s""");
+                String constructor = scanner.nextLine();
 
-                Book bkTmp = new Book();
-                bkTmp.setTitle(tmpTitle);
-                bkTmp.setAuthor(tmpAuthor);
-                bkTmp.setPrice(tmpPrice);
-                books[bkIdx++] = bkTmp;
-
+                if (!constructor.equals("2")) {
+                    System.out.print("Enter book title: ");
+                    String tmpTitle = scanner.nextLine();
+                    System.out.print("Enter book author:");
+                    String tmpAuthor = scanner.nextLine();
+                    System.out.print("Enter book price:");
+                    float tmpPrice = Float.parseFloat(scanner.nextLine());
+                    if (constructor.equals("1")) {
+                        Book bkTmp = new Book();
+                        bkTmp.setTitle(tmpTitle);
+                        bkTmp.setAuthor(tmpAuthor);
+                        bkTmp.setPrice(tmpPrice);
+                        books[bkIdx++] = bkTmp;
+                    } else {
+                        books[bkIdx++] = new Book(tmpTitle, tmpAuthor, tmpPrice);
+                    }
+                } else {
+                    System.out.print("Enter the index of the book to clone: ");
+                    auxIndex1 = Integer.parseInt(scanner.nextLine());
+                    try {
+                        books[bkIdx++] = (Book) books[auxIndex1].clone();
+                    } catch (Exception e) {
+                        System.out.println("Error cloning book");
+                    }
+                }
             } else if (userAction.equals("3")) {
-                if (bkIdx < 2) {
-                    System.out.println("You must add at least 2 books to compare prices!");
-                    continue;
-                }
-                System.out.print("Enter the index of the first book to compare: ");
+                System.out.print("Enter index of first book to change price: ");
                 auxIndex1 = Integer.parseInt(scanner.nextLine());
-                System.out.print("Enter the index of the second book to compare: ");
-                auxIndex2 = Integer.parseInt(scanner.nextLine());
 
-                if (auxIndex1 >= bkIdx || auxIndex2 >= bkIdx){
-                    System.out.println("Invalid indexes!");
+                if (auxIndex1 >= bkIdx) {
+                    System.out.println("Invalid index");
                     continue;
                 }
-                System.out.println(comparePrices(books[auxIndex1], books[auxIndex2]));
 
+                System.out.print("Enter the new price of the book: ");
+                books[auxIndex1].setPrice(Float.parseFloat(scanner.nextLine()));
+            } else if (userAction.equals("4")) {
+                System.out.print("Enter index of first book to compare: ");
+                auxIndex1 = Integer.parseInt(scanner.nextLine());
+                System.out.print("Enter index of second book to compare: ");
+                auxIndex2 = Integer.parseInt(scanner.nextLine());
+                if (auxIndex1 >= bkIdx || auxIndex2 >= bkIdx) {
+                    System.out.println("Invalid index");
+                    continue;
+                }
+                if (books[auxIndex1].equals(books[auxIndex2])) {
+                    System.out.println("The books are the same.");
+                } else {
+                    System.out.println("The books are not the same.");
+                }
             } else {
                 break;
             }
         }
     }
 }
-
